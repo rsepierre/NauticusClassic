@@ -1,17 +1,15 @@
 # Lib: HereBeDragons
 
-## [2.03-release](https://github.com/Nevcairiel/HereBeDragons/tree/2.03-release) (2020-02-08)
-[Full Changelog](https://github.com/Nevcairiel/HereBeDragons/compare/2.02-release...2.03-release)
+## [2.13-release](https://github.com/Nevcairiel/HereBeDragons/tree/2.13-release) (2023-07-12)
+[Full Changelog](https://github.com/Nevcairiel/HereBeDragons/compare/2.12-release...2.13-release) [Previous Releases](https://github.com/Nevcairiel/HereBeDragons/releases)
 
-- Unify overriding instance IDs  
-- Add more 8.3 vision phasing IDs  
-- Update TOC for 8.3  
-- Add static override for the minor vision in the Vale of Eternal Bossoms  
-- Check for existing static overrides as well  
-- Avoid dynamically mapping instances in both directions  
-- Properly mark variables as unused  
-- Add Uldum N'zoth Invasion Scenario override  
-- Add Arms Warrior Artifact Scenario override  
-- Add a dynamic instance ID override tracker for unknown scenarios  
-- Consistently specify an error level  
-- Add a type check for showFlag, otherwise it might error later  
+- Update TOC for 10.1.5  
+- HBD-Pins-2.0: Hack around combat limitations in 10.1.5  
+    SetPassThroughButtons can no longer be called in combat, but we allow  
+    creating pins at any time during play. Until such a point when this is  
+    fixed by Blizzard, noop out the function so that creating pins no longer  
+    errors.  
+    This function is called on the pin by Blizzards pin handler, which is of  
+    course insecure on addon-created pins.  
+- Update TOC for 10.1  
+- Update TOC for 10.0.7  
