@@ -1,6 +1,6 @@
 --[[
 Name: LibSimpleFrame-1.0
-Revision: $Revision: 153 $
+Revision: $Revision: 154 $
 Author(s): David Lynch (kemayo@gmail.com)
 Website: http://www.wowace.com/wiki/LibSimpleFrame-1.0
 Documentation: http://www.wowace.com/wiki/LibSimpleFrame-1.0
@@ -10,7 +10,7 @@ License: LGPL v2.1
 ]]
 
 local MAJOR_VERSION = "LibSimpleFrame-Mod-1.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 153 $"):match("%d+")) or 0
+local MINOR_VERSION = 90000 + tonumber(("$Revision: 154 $"):match("%d+")) or 0
 
 -- #AUTODOC_NAMESPACE lib
 
@@ -146,7 +146,7 @@ local function create_line(parent, i)
 	b.handlerValues = {}
 
 	if parent.db.lock then
-		b:RegisterForDrag(nil)
+		b:RegisterForDrag("")
 		b:EnableMouse(false)
 	else
 		b:RegisterForDrag("LeftButton")
@@ -307,16 +307,16 @@ local function Lock(self, toggle)
 	--self:SetScript("OnEvent", modifier_event)
 	--self:SetScript("OnUpdate", nil)
 
-	self:RegisterForDrag(nil)
+	self:RegisterForDrag("")
 	self:EnableMouse(false)
 	self:StopMovingOrSizing()
 	
 	for i,l in pairs(self.lines) do
-		l:RegisterForDrag(nil)
+		l:RegisterForDrag("")
 		l:EnableMouse(false)
 	end
 	for f in pairs(self.associates) do
-		f:RegisterForDrag(nil)
+		f:RegisterForDrag("")
 		f:EnableMouse(false)
 		if f.OnLock then f:OnLock() end
 	end

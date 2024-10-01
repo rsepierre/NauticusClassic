@@ -1,4 +1,4 @@
-﻿
+﻿local addonName, addon = ...
 -- declare colour codes for console messages
 local RED     = "|cffff0000"
 local GREEN   = "|cff00ff00"
@@ -23,9 +23,12 @@ local HBD = LibStub("HereBeDragons-2.0")
 local Pins = LibStub("HereBeDragons-Pins-2.0")
 local ldbicon = LibStub("LibDBIcon-1.0")
 
+local C_AddOns = setmetatable(C_AddOns or {},{__index=_G})
+local GetAddOnMetadata = C_AddOns.GetAddOnMetadata
+
 -- object variables
 NauticusClassic.DEFAULT_PREFIX = "NauticSync" -- do not change!
-NauticusClassic.versionNum = 131 -- for comparison
+NauticusClassic.versionNum = 0 -- deprecated, we'll derive it dynamically from .toc
 NauticusClassic.lowestNameTime = "--"
 NauticusClassic.tempText = ""
 NauticusClassic.tempTextCount = 0
@@ -314,10 +317,52 @@ function NauticusClassic:OnInitialize()
 	self:InitialiseConfig()
 end
 
+function NauticusClassic:versionParser(ours, theirs)
+	--[[
+	Convert semantic version to an numerically comparable version
+	- If we have 2 versions passed in return ver1_numeric, ver2_numeric, ver2_newer, ver2_majorupdate
+	- If we only get 1 version passed in, return the numeric conversion
+	]]
+	if not ours then
+		ours = self.version
+	end
+	if not ours then return end
+	local ours_num, theirs_num
+	if type(ours)=="string" then
+		local power=4
+		ours_num=0
+		for part in gmatch(ours,"%d+") do
+			local ver=tonumber(part)
+			ours_num=ours_num+ver*10^power
+			power = power-2
+		end
+	elseif type(ours)=="number" then
+		ours_num = ours
+	end
+	if type(theirs)=="string" then
+		local power=4
+		theirs_num=0
+		for part in gmatch(theirs,"%d+") do
+			local ver=tonumber(part)
+			theirs_num=theirs_num+ver*10^power
+			power = power-2
+		end
+	elseif type(theirs)=="number" then
+		theirs_num = theirs
+	end
+	if ours_num and theirs_num then
+		local ours_major = ours_num < 1000 and floor(ours_num/100) or floor(ours_num/10^4)
+		local theirs_major = theirs_num < 1000 and floor(theirs_num/100) or floor(theirs_num/10^4)
+		return ours_num, theirs_num, theirs_num > ours_num, theirs_major > ours_major
+	else
+		return ours_num
+	end
+end
+
 local onUpdateTimer = nil
 
 function GetCurrentMapOrInstanceID()
-	local id = C_Map.GetBestMapForUnit("player")
+	local id,_ = C_Map.GetBestMapForUnit("player")
 	if id == 1414 or id == 1415 then -- block returning continents
 		return nil
 	end
@@ -759,21 +804,23 @@ function NauticusClassic:InitialiseConfig()
 	do
 		local version
 		--@non-debug@
-		version = "1.3.1"
+		version = GetAddOnMetadata(addonName,"Version")
 		--@end-non-debug@
-		local title = "NauticusClassic"
+		local title = addonName
 		if version then
 			self.version = version
 			title = title.." "..version
+			self.versionNum = self:versionParser(version)
 		end
 		self.title = title
 	end
 
 	if self.db.global.newerVersion then
 		--self:DebugMessage("new version: "..self.db.global.newerVersion.." vs our "..self.versionNum)
-		if self.db.global.newerVersion > self.versionNum then
+		local ourVersion, theirVersion, isNewer, isMajorUpdate = self:versionParser(self.versionNum,self.db.global.newerVersion)
+		if isNewer then
 			-- major update released
-			if math.floor(self.db.global.newerVersion/10) > math.floor(self.versionNum/10) then
+			if isMajorUpdate then
 				self.comm_disable = true
 				self.update_available = true
 			else
